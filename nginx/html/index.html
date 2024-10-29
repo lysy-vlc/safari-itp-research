@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cookie Time Simulation Test</title>
+    <script>
+        async function simulateTimePassage(hours) {
+            // Simulate time passage
+            const timeRes = await fetch(`/api/time-travel?hours=${hours}`);
+            const timeData = await timeRes.json();
+
+            // Set new cookie with simulated time
+            const cookieRes = await fetch('/api/set-cookie', {
+                headers: {
+                    'x-time-shift': hours.toString()
+                }
+            });
+
+            // Update display
+            displayCookieInfo();
+
+            document.getElementById('time-info').innerHTML = `
+                <p>Simulated time passage: ${hours} hours</p>
+                <p>New timestamp: ${timeData.newTime}</p>
+            `;
+        }
+
+        function displayCookieInfo() {
+            const cookieInfo = document.getElementById('cookie-info');
+            cookieInfo.innerHTML = `
+                <h3>Current Cookies:</h3>
+                <pre>${document.cookie || 'No cookies'}</pre>
+            `;
+        }
+
+        // Initial display
+        document.addEventListener('DOMContentLoaded', displayCookieInfo);
+    </script>
+</head>
+<body>
+<h1>Cookie Time Simulation Test</h1>
+
+<div>
+    <button onclick="simulateTimePassage(24)">Simulate 24 hours</button>
+    <button onclick="simulateTimePassage(168)">Simulate 7 days</button>
+    <button onclick="simulateTimePassage(720)">Simulate 30 days</button>
+</div>
+
+<div id="time-info"></div>
+<div id="cookie-info"></div>
+
+<div>
+    <h3>Test Instructions:</h3>
+    <ol>
+        <li>Click buttons to simulate time passage</li>
+        <li>Check cookie status after each simulation</li>
+        <li>For Safari, use the Web Inspector to verify ITP behavior</li>
+        <li>For other browsers, check cookie expiration times</li>
+    </ol>
+</div>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Safari ITP Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        .result { margin-top: 10px; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+<h1>Safari ITP Test Page</h1>
+
+<div class="test-section">
+    <h2>1. First-Party Cookie Test</h2>
+    <button onclick="setFirstPartyCookie()">Set First-Party Cookie</button>
+    <div id="firstPartyResult" class="result">Results will appear here</div>
+</div>
+
+<div class="test-section">
+    <h2>2. localStorage Test</h2>
+    <button onclick="setLocalStorage()">Set localStorage</button>
+    <div id="localStorageResult" class="result">Results will appear here</div>
+</div>
+
+<div class="test-section">
+    <h2>3. Cross-Site Tracking Test</h2>
+    <button onclick="simulateCrossSiteTracking()">Simulate Cross-Site Request</button>
+    <div id="crossSiteResult" class="result">Results will appear here</div>
+</div>
+
+<div class="test-section">
+    <h2>Debug Information</h2>
+    <div id="debugInfo" class="result">Debug info will appear here</div>
+</div>
+
+<script>
+    function setFirstPartyCookie() {
+        const value = 'test-' + Date.now();
+        document.cookie = `fp_test=${value};path=/;max-age=31536000`;
+        checkAndDisplayCookie('fp_test', 'firstPartyResult');
+    }
+
+    function setLocalStorage() {
+        const value = 'test-' + Date.now();
+        try {
+            localStorage.setItem('ls_test', value);
+            document.getElementById('localStorageResult').textContent =
+                `localStorage set: ${value}`;
+        } catch (e) {
+            document.getElementById('localStorageResult').textContent =
+                `Error: ${e.message}`;
+        }
+    }
+
+    function simulateCrossSiteTracking() {
+        const img = new Image();
+        img.src = 'https://test-tracker.local/pixel.gif?id=' + Date.now();
+        document.getElementById('crossSiteResult').textContent =
+            'Cross-site request simulated';
+    }
+
+    function checkAndDisplayCookie(name, elementId) {
+        const value = document.cookie.split('; ')
+            .find(row => row.startsWith(name + '='))
+            ?.split('=')[1];
+        document.getElementById(elementId).textContent =
+            value ? `Cookie ${name}=${value}` : 'Cookie not found';
+    }
+
+    function updateDebugInfo() {
+        const info = {
+            'User Agent': navigator.userAgent,
+            'Cookies Enabled': navigator.cookieEnabled,
+            'localStorage Available': !!window.localStorage,
+            'Current Cookies': document.cookie,
+            'localStorage Content': JSON.stringify(localStorage)
+        };
+
+        document.getElementById('debugInfo').innerHTML =
+            Object.entries(info)
+                .map(([k, v]) => `<strong>${k}:</strong> ${v}`)
+                .join('<br>');
+    }
+
+    updateDebugInfo();
+    setInterval(updateDebugInfo, 1000);
+</script>
+</body>
+</html>
